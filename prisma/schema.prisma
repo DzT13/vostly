@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id              String           @id @default(cuid())
+  title           String
+  content         String           @default("")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  analysisHistory AnalysisResult[]
+  chatMessages    ChatMessage[]
+
+  @@index([createdAt])
+  @@index([updatedAt])
+}
+
+model AnalysisResult {
+  id              String   @id @default(cuid())
+  postId          String
+  timestamp       DateTime @default(now())
+  clarityScore    Int
+  ambiguityIssues String   @default("[]")
+  toneAssessment  String   @default("{}")
+  suggestions     String   @default("[]")
+  strengths       String   @default("[]")
+  aiProvider      String
+  modelUsed       String
+  post            Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId, timestamp])
+}
+
+model ChatMessage {
+  id         String   @id @default(cuid())
+  postId     String?
+  role       String   @default("user")
+  content    String
+  timestamp  DateTime @default(now())
+  aiProvider String
+  modelUsed  String
+  post       Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([timestamp])
+}
+
+model AIProviderSettings {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  baseUrl         String
+  apiKey          String
+  defaultModel    String
+  isActive        Boolean  @default(false)
+  supportedModels String   @default("[]")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([isActive])
+}
