@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+﻿# Vostly – Local Writing Workspace
 
-## Getting Started
+Private, single-user Next.js app for organizing and analyzing written content with a configurable, OpenAI‑compatible assistant.
 
-First, run the development server:
+## Quick Start
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+1) Install dependencies
+
+```
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2) Configure environment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create `.env` with a SQLite path and app name (already set by default):
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+DATABASE_URL="file:./prisma/dev.db"
+NEXT_PUBLIC_APP_NAME="Vostly AI Writer"
+```
 
-## Learn More
+3) Database
 
-To learn more about Next.js, take a look at the following resources:
+The schema and initial migration SQL live in `prisma/`. We executed the SQL directly and generated the Prisma client. If you run into Prisma migrate issues on Windows, see `Dev-doc/prisma-migration-issue.md`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Generate the client (safe to re-run):
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+npm run db:generate
+```
 
-## Deploy on Vercel
+4) Run the app
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+npm run dev
+```
+Open http://localhost:3000
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## What’s Included (Phase 1)
+
+- Next.js 15 + TypeScript + Tailwind CSS (App Router)
+- Prisma + SQLite schema (Post, AnalysisResult, ChatMessage, AIProviderSettings)
+- API routes scaffolding for posts, analysis, chat, and AI provider settings
+- Basic UI: layout, dashboard, editor placeholder, settings list
+- Validation with Zod
+- AI client abstractions for OpenAI‑compatible and Anthropic endpoints (Phase 3 wiring later)
+
+## Scripts
+
+- `npm run dev` – start dev server
+- `npm run build` – build production
+- `npm run start` – start production server
+- `npm run lint` – lint code
+- `npm run db:generate` – generate Prisma client
+- `npm run db:migrate` – run migrations (see note below)
+
+## Prisma Migration Note
+
+`npx prisma migrate deploy` may error due to a provider lock mismatch when histories were initialized manually. Until resolved:
+- Use `npx prisma db execute --file prisma/migrations/0001_init/migration.sql` to apply schema
+- Then `npm run db:generate`
+- Details in `Dev-doc/prisma-migration-issue.md`
+
+## Documentation
+
+- Phase overview: `Dev-doc/phase1-foundation.md`
+- Prisma issue log: `Dev-doc/prisma-migration-issue.md`
+
+## License
+
+MIT (add your preferred license if different)
